@@ -1,6 +1,5 @@
 package com.example.profilecardlayout
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,26 +7,27 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.profilecardlayout.ui.theme.ComposeApplicationTheme
+import com.example.profilecardlayout.ui.theme.MyTheme
+import lightGreen
+import java.security.Provider
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen()
+            MyTheme {
+                MainScreen()
+            }
         }
     }
 }
@@ -36,7 +36,6 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color.LightGray
     ) {
         ProfileCard()
     }
@@ -49,11 +48,14 @@ fun ProfileCard() {
             .padding(16.dp)
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top),
-        elevation = 8.dp
+        elevation = 8.dp,
+        backgroundColor = Color.White
     ) {
-        Row(modifier = Modifier.fillMaxWidth(),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start) {
+            horizontalArrangement = Arrangement.Start
+        ) {
             ProfilePicture()
             ProfileContent()
         }
@@ -66,7 +68,7 @@ fun ProfilePicture() {
         shape = CircleShape,
         border = BorderStroke(
             width = 2.dp,
-            color = Color.Green
+            color = lightGreen
         ),
         modifier = Modifier.padding(16.dp),
         elevation = 4.dp
@@ -82,11 +84,37 @@ fun ProfilePicture() {
 
 @Composable
 fun ProfileContent() {
-    Text("Max Versttappen")
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = "Max Versttappen",
+            style = MaterialTheme.typography.h5
+        )
+
+        //Providers(AmbientContentAlpha providers(ContentAlpha.medium)){
+        //  Text(
+        //                text = "Active now !!!",///
+        //                style = MaterialTheme.typography.body2
+        //            )}
+
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            Text(
+                text = "Active now !!!",///
+                style = MaterialTheme.typography.body2
+            )
+        }
+
+
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    MainScreen()
+    MyTheme {
+        MainScreen()
+    }
 }
