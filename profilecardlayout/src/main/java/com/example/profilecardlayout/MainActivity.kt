@@ -1,13 +1,18 @@
 package com.example.profilecardlayout
 
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -17,9 +22,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.transform.CircleCropTransformation
 import com.example.profilecardlayout.ui.theme.MyTheme
-import lightGreen
-import java.security.Provider
+import com.example.profilecardlayout.ui.theme.lightGreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,19 +41,41 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen() {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        ProfileCard()
+fun MainScreen(userProfiles: List<UserProfile> = userProfileList) {
+
+    Scaffold(topBar = { AppBar() }) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            LazyColumn {
+                items(userProfiles) { userProfile ->
+                    ProfileCard(userProfile = userProfile)
+                }
+
+
+            }
+        }
     }
 }
 
 @Composable
-fun ProfileCard() {
+fun AppBar() {
+    TopAppBar(
+        navigationIcon = {
+            Icon(
+                Icons.Default.Home,
+                "content Description",
+                Modifier.padding(horizontal = 12.dp)
+            )
+        },
+        title = { Text(text = "Messaging Users") })
+}
+
+@Composable
+fun ProfileCard(userProfile: UserProfile) {
     Card(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(top = 8.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top),
         elevation = 8.dp,
@@ -56,53 +86,57 @@ fun ProfileCard() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            ProfilePicture()
-            ProfileContent()
+            ProfilePicture(userProfile.drawableId, userProfile.status)
+            ProfileContent(userProfile.name, userProfile.status)
         }
     }
 }
 
 @Composable
-fun ProfilePicture() {
+fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
     Card(
         shape = CircleShape,
         border = BorderStroke(
             width = 2.dp,
-            color = lightGreen
+            color = if (onlineStatus)
+                MaterialTheme.colors.lightGreen
+            else Color.Red
         ),
         modifier = Modifier.padding(16.dp),
         elevation = 4.dp
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.profile),
-            contentDescription = "",
+
+        AsyncImage(
+            model = drawableId,
+            contentDescription = null,
             modifier = Modifier.size(72.dp),
             contentScale = ContentScale.Crop
         )
     }
 }
 
+
 @Composable
-fun ProfileContent() {
+fun ProfileContent(userName: String, onlineStatus: Boolean) {
     Column(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
     ) {
-        Text(
-            text = "Max Versttappen",
-            style = MaterialTheme.typography.h5
-        )
 
-        //Providers(AmbientContentAlpha providers(ContentAlpha.medium)){
-        //  Text(
-        //                text = "Active now !!!",///
-        //                style = MaterialTheme.typography.body2
-        //            )}
+        CompositionLocalProvider(
+            LocalContentAlpha provides (
+                    if (onlineStatus)
+                        1f else ContentAlpha.medium)
+        ) {
+        }
 
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
-                text = "Active now !!!",///
+                text = if (onlineStatus)
+                    "Active now"
+                else
+                    "Offline",
                 style = MaterialTheme.typography.body2
             )
         }
